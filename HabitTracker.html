@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+    body {
+        font-family: Arial, "Segoe UI Symbol", sans-serif;
+        margin: 0;
+        padding: 10px;
+        background: transparent;
+        font-size: 14px;
+    }
+
+    .container {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .navigation {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 15px;
+        padding: 0 5px;
+        width: 20%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .arrow {
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #f1f5f9;
+        padding: 5px 10px;
+        border-radius: 4px;
+        flex-shrink: 0;
+        line-height: 1;
+        font-family: Arial, sans-serif;
+    }
+
+    #monthYear {
+        font-size: 1.1rem;
+        color: white;
+        font-weight: 500;
+        text-align: center;
+        flex-grow: 1;
+        min-width: 180px;
+    }
+
+    .habit-input {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0 5px;
+    }
+
+    #habitInput {
+        padding: 6px 10px;
+        border-radius: 4px;
+        flex: 1 1 200px;
+        min-width: 150px;
+        max-width: 100%;
+        font-size: 0.9rem;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: white;
+    }
+
+    .habit-input button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        background-color: #4299e1;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .habit-input button:hover {
+        background-color: #3182ce;
+    }
+	
+	#daysRow td:first-child {
+		border-left: none;
+	}
+	
+	
+	
+	#datesRow td:first-child {
+		border-left: none;
+		border-bottom: none;
+	}
+
+    table {
+        width: 100%;
+        table-layout: auto;
+        margin-bottom: 10px;
+	    border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 2px;
+        font-size: 0.7rem;
+        min-width: 20px;
+        height: 24px;
+        border: 1px solid rgba(187, 187, 187, 0.07);
+        text-align: center;
+        overflow: hidden;
+        color: white;
+    }
+
+    .habit-row td:first-child {
+        left: 0;
+        min-width: 80px;
+       /* max-width: 100px; */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 2px 4px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+		border-left: none;
+		border-bottom: none;
+    }
+
+    .habit-row td {
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .habit-row td.checked::after {
+        content: '\2713';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .delete-habit {
+        cursor: pointer;
+        color: #e53e3e;
+        font-weight: bold;
+        margin-left: 8px;
+        padding: 0 4px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .delete-habit:hover {
+        background-color: #fed7d7;
+    }
+	
+	#daysRow td.today {
+		border-top: 2px solid white !important;
+	}
+	
+	#habitRows tr:last-child td.todayHabits {
+		border-bottom: 2px solid white !important;
+	}
+
+    .today {
+        background-color: rgba(187, 187, 187, 0.1) !important;
+        color: white !important;
+		border-left: 2px solid white;
+		border-right: 2px solid white;
+    }
+	
+	.todayHabits {
+		border-left: 2px solid white;
+		border-right: 2px solid white;
+	}
+	
+
+    .data-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+
+    .export-import-btn {
+        padding: 6px 12px;
+        background-color: transparent;
+        color: white;
+        border: 1px solid rgba(187, 187, 187, 0.07);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .export-import-btn:hover {
+        background-color: rgba(187, 187, 187, 0.07);;
+    }
+
+    #fileInput {
+        display: none;
+    }
+
+    .data-viewer {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        z-index: 1000;
+        max-width: 80%;
+        display: none;
+    }
+
+    #exportDataContent {
+        width: 400px;
+        height: 300px;
+        font-family: monospace;
+        margin: 10px 0;
+        padding: 10px;
+        white-space: pre-wrap;
+    }
+	
+	/* Custom Scrollbars - Applies to both vertical and horizontal */
+	::-webkit-scrollbar {
+		width: 8px;  /* Vertical scrollbar width */
+		height: 8px; /* Horizontal scrollbar height */
+	}
+
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: rgba(255, 255, 255, 0.3);
+	}
+
+	/* Firefox Support */
+	@supports (scrollbar-color: auto) {
+		* {
+			scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+			scrollbar-width: thin;
+		}
+	}
+
+    /* Responsive Adjustments */
+    @media (max-width: 640px) {
+        th, td {
+            min-width: 18px;
+            height: 22px;
+            font-size: 0.6rem;
+        }
+        
+        .habit-row td:first-child {
+            min-width: 70px;
+            font-size: 0.65rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        body {
+            font-size: 13px;
+        }
+        
+        .arrow {
+            font-size: 1rem;
+            padding: 3px 8px;
+        }
+
+        #monthYear {
+            font-size: 1rem;
+        }
+
+        th, td {
+            min-width: 16px;
+            height: 20px;
+            font-size: 0.55rem;
+            padding: 1px;
+        }
+
+        .habit-row td:first-child {
+            min-width: 60px;
+            font-size: 0.6rem;
+            padding-left: 4px;
+        }
+
+        .navigation {
+            width: 30%;
+        }
+
+        #exportDataContent {
+            width: 280px;
+            height: 200px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        th, td {
+            min-width: 14px;
+            height: 18px;
+            font-size: 0.5rem;
+        }
+        
+        .habit-row td:first-child {
+            min-width: 50px;
+            font-size: 0.55rem;
+        }
+        
+        .arrow {
+            padding: 2px 6px;
+            font-size: 1rem;
+        }
+        
+        #monthYear {
+            min-width: 140px;
+        }
+
+        .habit-input {
+            flex-direction: column;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="data-actions">
+            <button class="export-import-btn" onclick="showExportData()">Export Data</button>
+            <button class="export-import-btn" onclick="importData()">Import Data</button>
+            <input type="file" id="fileInput" accept=".json">
+        </div>
+        
+        <div class="data-viewer" id="dataViewer">
+            <h3 style="margin-top: 0">Export Data</h3>
+            <textarea id="exportDataContent" readonly></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end">
+                <button onclick="copyToClipboard()">Copy</button>
+                <button onclick="hideExportData()">Close</button>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <span class="arrow" onclick="changeMonth(-1)">&larr;</span>
+            <div id="monthYear"></div>
+            <span class="arrow" onclick="changeMonth(1)">&rarr;</span>
+        </div>
+        
+        
+
+        <table>
+            <thead>
+				<tr id="daysRow"></tr>
+                <tr id="datesRow"></tr>
+            </thead>
+            <tbody id="habitRows"></tbody>
+        </table>
+		
+		<div class="habit-input">
+            <input type="text" id="habitInput" placeholder="+ New Habit">
+        </div>
+    </div>
+
+    <script>
+        const colorPalette = [
+            { bg: '#c6f6d5', text: '#22543d' },
+            { bg: '#fed7d7', text: '#822727' },
+            { bg: '#c3dafe', text: '#2c5282' },
+            { bg: '#fefcbf', text: '#744210' },
+            { bg: '#e9d8fd', text: '#44337a' },
+            { bg: '#fed7af', text: '#7b341e' }
+        ];
+
+        let currentMonth = new Date();
+        currentMonth.setDate(1);
+        const monthYear = document.getElementById('monthYear');
+        let habits = JSON.parse(localStorage.getItem('habits')) || [];
+		const habitInput = document.getElementById('habitInput');
+
+        habitInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const habitName = habitInput.value.trim();
+                if (habitName) {
+					// Get previous habit's color
+					let lastColor = null;
+					if (habits.length > 0) {
+						lastColor = habits[habits.length - 1].color;
+					}
+					
+					//
+					const availableColors = colorPalette.filter(color =>
+						!lastColor || color.bg !== lastColor.bg
+					);
+					
+					// Select random color from remaining options
+					const randomColor = availableColors.length > 0
+						? availableColors[Math.floor(Math.random() * availableColors.length)]
+						: colorpalette[Math.floor(Math.random() * colorPalette.length)];
+						
+						
+                    habits.push({
+                        name: habitName,
+                        checks: {},
+                        color: randomColor
+                    });
+                    habitInput.value = '';
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                    renderHabits();
+                }
+            }
+        });
+
+        function showExportData() {
+            const data = JSON.stringify(habits, null, 2);
+            const viewer = document.getElementById('dataViewer');
+            const textarea = document.getElementById('exportDataContent');
+            textarea.value = data;
+            viewer.style.display = 'block';
+        }
+
+        function hideExportData() {
+            document.getElementById('dataViewer').style.display = 'none';
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('exportDataContent');
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Data copied to clipboard!');
+            } catch (err) {
+                alert('Failed to copy data');
+            }
+        }
+
+        function importData() {
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const newData = JSON.parse(e.target.result);
+                    habits = newData.map(habit => ({
+                        ...habit,
+                        color: habit.color || colorPalette[Math.floor(Math.random() * colorPalette.length)]
+                    }));
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                    renderHabits();
+                    alert('Data imported successfully!');
+                } catch (error) {
+                    alert('Error importing data: Invalid file format');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function updateDisplay() {
+            monthYear.textContent = currentMonth.toLocaleString('default', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+
+            const datesRow = document.getElementById('datesRow');
+            const daysRow = document.getElementById('daysRow');
+            datesRow.innerHTML = '';
+            daysRow.innerHTML = '';
+
+            datesRow.appendChild(document.createElement('td'));
+            daysRow.appendChild(document.createElement('td'));
+
+            const daysInMonth = new Date(
+                currentMonth.getFullYear(),
+                currentMonth.getMonth() + 1,
+                0
+            ).getDate();
+
+            const today = new Date();
+            const isCurrentMonth = currentMonth.getMonth() === today.getMonth() &&
+                currentMonth.getFullYear() === today.getFullYear();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                
+                const dateCell = document.createElement('td');
+                dateCell.textContent = day;
+                if (isCurrentMonth && day === today.getDate()) {
+                    dateCell.classList.add('today');
+                }
+                datesRow.appendChild(dateCell);
+
+                const dayCell = document.createElement('td');
+				if (isCurrentMonth && day === today.getDate()) {
+                    dayCell.classList.add('today');
+                }
+                dayCell.textContent = ['Su','Mo','Tu','We','Th','Fr','Sa'][date.getDay()].slice(0,1);
+                daysRow.appendChild(dayCell);
+            }
+
+            renderHabits();
+        }
+
+
+        function renderHabits() {
+            const habitRows = document.getElementById('habitRows');
+            habitRows.innerHTML = '';
+
+            habits.forEach((habit, index) => {
+                const row = document.createElement('tr');
+                row.className = 'habit-row';
+                
+                const nameCell = document.createElement('td');
+                nameCell.innerHTML = `
+                    <span style="font-weight:bold">${habit.name}</span>
+					<span class="delete-habit" onclick="removeHabit(${index})">−</span>
+                `;
+				nameCell.className='habit-name'
+                row.appendChild(nameCell);
+
+                const daysInMonth = new Date(
+                    currentMonth.getFullYear(),
+                    currentMonth.getMonth() + 1,
+                    0
+                ).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const cell = document.createElement('td');
+                    const monthKey = `${currentMonth.getFullYear()}-${currentMonth.getMonth()}`;
+                    const isChecked = habit.checks[`${monthKey}-${day}`] || false;
+                    
+                    if (isChecked) {
+                        cell.style.backgroundColor = habit.color.bg;
+                        cell.style.color = habit.color.text;
+                        cell.classList.add('checked');
+                    }
+					
+					// Add current date on habits rows
+					const today = new Date();
+                    if (currentMonth.getMonth() === today.getMonth() &&
+                        currentMonth.getFullYear() === today.getFullYear() &&
+                        day === today.getDate()) {
+                        cell.classList.add('todayHabits');
+                    }
+
+
+                    cell.addEventListener('click', () => {
+                        const isNowChecked = !cell.classList.contains('checked');
+                        cell.classList.toggle('checked');
+                        cell.style.backgroundColor = isNowChecked ? habit.color.bg : '';
+                        cell.style.color = isNowChecked ? habit.color.text : '';
+                        habit.checks[`${monthKey}-${day}`] = isNowChecked;
+                        localStorage.setItem('habits', JSON.stringify(habits));
+                    });
+
+                    row.appendChild(cell);
+                }
+
+                habitRows.appendChild(row);
+            });
+        }
+
+        function removeHabit(index) {
+            if (confirm('Are you sure you want to delete this habit?')) {
+                habits.splice(index, 1);
+                localStorage.setItem('habits', JSON.stringify(habits));
+                renderHabits();
+            }
+        }
+
+        function changeMonth(offset) {
+            currentMonth.setMonth(currentMonth.getMonth() + offset);
+            updateDisplay();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
